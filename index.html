@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #1e3c72, #2a5298);
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+       .quiz-container {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 600px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 2.5em;
+            font-weight: 700;
+            color: #ffd700;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        p {
+            font-size: 1.2em;
+            margin: 10px 0;
+        }
+
+        input[type="text"] {
+            padding: 15px;
+            font-size: 1em;
+            margin: 20px 0;
+            border: 2px solid #ffd700;
+            border-radius: 5px;
+            width: calc(100% - 30px);
+            background: transparent;
+            color: #fff;
+            outline: none;
+            transition: border 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ffab00;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1em;
+            border: none;
+            border-radius: 5px;
+            background: #ffd700;
+            color: #000;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        button:hover {
+            background: #ffab00;
+            transform: scale(1.05);
+        }
+
+        #score {
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+
+       .category {
+            display: none;
+        }
+
+        #username-container {
+            display: none;
+        }
+
+        #quiz {
+            display: none;
+        }
+
+       .timer {
+            font-size: 1.5em;
+            margin-top: 10px;
+            color: #ffab00;
+        }
+
+       .hint {
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #ffd700;
+        }
+
+       .leaderboard {
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+       .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #ffd700;
+            border-radius: 10px;
+            margin-top: 10px;
+        }
+
+       .progress-bar-fill {
+            width: 0%;
+            height: 100%;
+            background: #ffab00;
+            border-radius: 10px;
+            transition: width 0.5s;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h1>Interactive Quiz</h1>
+        <div id="category-selection">
+            <p>Select a category to start:</p>
+            <button onclick="selectCategory('coding')">Coding</button>
+            <button onclick="selectCategory('physics')">Physics</button>
+            <button onclick="selectCategory('math')">Mathematics</button>
+        </div>
+        <div id="username-container">
+            <p>Enter your name:</p>
+            <input type="text" id="username" placeholder="Your name" />
+            <button onclick="startQuiz()">Start Quiz</button>
+        </div>
+        <div id="quiz" class="category">
+            <p id="username-display"></p>
+            <p id="question"></p>
+            <input type="text" id="answer" placeholder="Your answer" />
+            <button onclick="checkAnswer()">Submit</button>
+            <p id="score">Score: 0</p>
+            <p class="timer">Timer: 30s</p>
+            <p class="hint">Hint: Not available</p>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" style="width: 0%;"></div>
+            </div>
+        </div>
+        <div id="leaderboard" class="category">
+            <h2>Leaderboard</h2>
+            <p>High scores:</p>
+            <ul id="high-scores"></ul>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let currentQuestion = 0;
+        let questions = [];
+        let username = '';
+        let timer;
+        let timeLeft = 30;
+        let hintText = '';
+
+        const categories = {
+            coding: [
+                { question: "What is the output of `console.log(2 + 2)`?", answer: "4", hint: "It's a basic JavaScript expression." },
+                { question: "What keyword is used to declare a variable in JavaScript?", answer: "var", hint: "It's a JavaScript keyword." },
+                { question: "What does HTML stand for?", answer: "HyperText Markup Language", hint: "It's a web technology." },
+            ],
+            physics: [
+                { question: "What is the acceleration due to gravity on Earth?", answer: "9.8", hint: "It's approximately the acceleration of a free-falling object near the Earth's surface." },
+                { question: "What is the formula for force?", answer: "F=ma", hint: "F is force, m is mass, and a is acceleration." },
+                { question: "Who developed the theory of relativity?", answer: "Einstein", hint: "Albert Einstein, a famous physicist." },
+            ],
+            math: [
+                { question: "What is 5 + 3?", answer: "8", hint: "Add the numbers together." },
+                { question: "What is 12 - 4?", answer: "8", hint: "Subtract 4 from 12." },
+                { question: "What is 9 + 10?", answer: "19", hint: "Add 9 and 10." },
+            ]
+        };
+
+        function selectCategory(category) {
+            questions = categories[category];
+            document.getElementById('category-selection').style.display = 'none';
+            document.getElementById('username-container').style.display = 'block';
+        }
+
+        function startQuiz() {
+            username = document.getElementById('username').value.trim();
+            if (username === '') {
+                alert('Please enter your name.');
+                return;
+            }
+            document.getElementById('username-container').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('username-display').textContent = `Welcome, ${username}!`;
+            loadQuestion();
+            startTimer();
+            getHighScores();
+        }
+
+        function loadQuestion() {
+            if (currentQuestion < questions.length) {
+                document.getElementById('question').textContent = questions[currentQuestion].question;
+                document.getElementById('answer').value = '';
+                document.getElementById('answer').focus();
+                hintText = questions[currentQuestion].hint;
+                document.querySelector('.hint').textContent = `Hint: ${hintText}`;
+                updateProgressBar();
+            } else {
+                document.getElementById('question').textContent = 'Quiz completed!';
+                document.getElementById('answer').disabled = true;
+                document.querySelector('#quiz button').disabled = true;
+                alert('Congratulations! You have completed the quiz.');
+            }
+        }
+
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer').value;
+            if (userAnswer === questions[currentQuestion].answer) {
+                score++;
+                alert('Correct!');
+            } else {
+                alert('Incorrect. Inspect to check the answer.');
+                return; // Don't proceedto the next question
+            }
+
+            currentQuestion++;
+            document.getElementById('score').textContent = 'Score: ' + score;
+            loadQuestion();
+        }
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                document.querySelector('.timer').textContent = `Timer: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert('Time\'s up! You have completed the quiz.');
+                    document.getElementById('answer').disabled = true;
+                    document.querySelector('#quiz button').disabled = true;
+                }
+            }, 1000);
+        }
+
+        function updateProgressBar() {
+            const progressBarFill = document.querySelector('.progress-bar-fill');
+            const progress = (currentQuestion / questions.length) * 100;
+            progressBarFill.style.width = `${progress}%`;
+        }
+
+        function getHighScores() {
+            const highScores = localStorage.getItem('highScores');
+            if (highScores) {
+                const scores = JSON.parse(highScores);
+                const highScoresList = document.getElementById('high-scores');
+                scores.forEach((score) => {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `${score.username}: ${score.score}`;
+                    highScoresList.appendChild(listItem);
+                });
+            }
+        }
+
+        function saveHighScore() {
+            const highScores = localStorage.getItem('highScores');
+            let scores = [];
+            if (highScores) {
+                scores = JSON.parse(highScores);
+            }
+            scores.push({ username, score });
+            localStorage.setItem('highScores', JSON.stringify(scores));
+        }
+
+        window.addEventListener('unload', saveHighScore);
+    </script>
+</body>
+</html>
