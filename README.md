@@ -1,7 +1,3 @@
-Here is the updated README in markdown format:
-
----
-
 # Interactive Quiz
 
 This is an interactive quiz web application where users can test their knowledge in various subjects such as Coding, Physics, and Mathematics.
@@ -19,10 +15,57 @@ This is an interactive quiz web application where users can test their knowledge
 
 ## Technologies Used
 
-- HTML
-- CSS (with custom styling for a premium and futuristic look)
-- JavaScript
-- Bootstrap (for responsive design)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1e1e2f;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            background: #2a2a3d;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+        li:hover {
+            transform: scale(1.05);
+            background: #35354f;
+        }
+        li i {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <ul>
+        <li><i class="fab fa-html5" style="color: #e34c26;"></i> HTML</li>
+        <li><i class="fab fa-css3-alt" style="color: #264de4;"></i> CSS (with custom styling for a premium and futuristic look)</li>
+        <li><i class="fab fa-js-square" style="color: #f7df1e;"></i> JavaScript</li>
+        <li><i class="fab fa-bootstrap" style="color: #7952b3;"></i> Bootstrap (for responsive design)</li>
+    </ul>
+</body>
+</html>
+
 
 ## How to Use
 
