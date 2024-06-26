@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Quiz</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
-
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(to right, #1e3c72, #2a5298);
@@ -19,7 +18,7 @@
             overflow: hidden;
         }
 
-       .quiz-container {
+        .quiz-container {
             background: rgba(0, 0, 0, 0.8);
             padding: 30px;
             border-radius: 15px;
@@ -86,7 +85,7 @@
             font-size: 1.5em;
         }
 
-       .category {
+        .category {
             display: none;
         }
 
@@ -98,24 +97,24 @@
             display: none;
         }
 
-       .timer {
+        .timer {
             font-size: 1.5em;
             margin-top: 10px;
             color: #ffab00;
         }
 
-       .hint {
+        .hint {
             font-size: 1.2em;
             margin-top: 10px;
             color: #ffd700;
         }
 
-       .leaderboard {
+        .leaderboard {
             font-size: 1.5em;
             margin-top: 20px;
         }
 
-       .progress-bar {
+        .progress-bar {
             width: 100%;
             height: 20px;
             background: #ffd700;
@@ -123,7 +122,7 @@
             margin-top: 10px;
         }
 
-       .progress-bar-fill {
+        .progress-bar-fill {
             width: 0%;
             height: 100%;
             background: #ffab00;
@@ -137,20 +136,20 @@
         <h1>Interactive Quiz</h1>
         <div id="category-selection">
             <p>Select a category to start:</p>
-            <button onclick="selectCategory('coding')">Coding</button>
-            <button onclick="selectCategory('physics')">Physics</button>
-            <button onclick="selectCategory('math')">Mathematics</button>
+            <button class="btn btn-primary" onclick="selectCategory('coding')">Coding</button>
+            <button class="btn btn-primary" onclick="selectCategory('physics')">Physics</button>
+            <button class="btn btn-primary" onclick="selectCategory('math')">Mathematics</button>
         </div>
         <div id="username-container">
             <p>Enter your name:</p>
             <input type="text" id="username" placeholder="Your name" />
-            <button onclick="startQuiz()">Start Quiz</button>
+            <button class="btn btn-primary" onclick="startQuiz()">Start Quiz</button>
         </div>
         <div id="quiz" class="category">
             <p id="username-display"></p>
             <p id="question"></p>
             <input type="text" id="answer" placeholder="Your answer" />
-            <button onclick="checkAnswer()">Submit</button>
+            <button class="btn btn-primary" onclick="checkAnswer()">Submit</button>
             <p id="score">Score: 0</p>
             <p class="timer">Timer: 30s</p>
             <p class="hint">Hint: Not available</p>
@@ -165,6 +164,7 @@
         </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script>
         let score = 0;
         let currentQuestion = 0;
@@ -194,19 +194,19 @@
 
         function selectCategory(category) {
             questions = categories[category];
-            document.getElementById('category-selection').style.display = 'none';
-            document.getElementById('username-container').style.display = 'block';
+            $('#category-selection').hide();
+            $('#username-container').show();
         }
 
         function startQuiz() {
-            username = document.getElementById('username').value.trim();
+            username = $('#username').val().trim();
             if (username === '') {
                 alert('Please enter your name.');
                 return;
             }
-            document.getElementById('username-container').style.display = 'none';
-            document.getElementById('quiz').style.display = 'block';
-            document.getElementById('username-display').textContent = `Welcome, ${username}!`;
+            $('#username-container').hide();
+            $('#quiz').show();
+            $('#username-display').text(`Welcome, ${username}!`);
             loadQuestion();
             startTimer();
             getHighScores();
@@ -214,63 +214,61 @@
 
         function loadQuestion() {
             if (currentQuestion < questions.length) {
-                document.getElementById('question').textContent = questions[currentQuestion].question;
-                document.getElementById('answer').value = '';
-                document.getElementById('answer').focus();
+                $('#question').text(questions[currentQuestion].question);
+                $('#answer').val('');
+                $('#answer').focus();
                 hintText = questions[currentQuestion].hint;
-                document.querySelector('.hint').textContent = `Hint: ${hintText}`;
+                $('.hint').text(`Hint: ${hintText}`);
                 updateProgressBar();
             } else {
-                document.getElementById('question').textContent = 'Quiz completed!';
-                document.getElementById('answer').disabled = true;
-                document.querySelector('#quiz button').disabled = true;
+                $('#question').text('Quiz completed!');
+                $('#answer').prop('disabled', true);
+                $('#quiz button').prop('disabled', true);
                 alert('Congratulations! You have completed the quiz.');
             }
         }
 
         function checkAnswer() {
-            const userAnswer = document.getElementById('answer').value;
+            const userAnswer = $('#answer').val();
             if (userAnswer === questions[currentQuestion].answer) {
                 score++;
                 alert('Correct!');
             } else {
                 alert('Incorrect. Inspect to check the answer.');
-                return; // Don't proceedto the next question
             }
-
             currentQuestion++;
-            document.getElementById('score').textContent = 'Score: ' + score;
+            $('#score').text(`Score: ${score}`);
             loadQuestion();
         }
 
         function startTimer() {
             timer = setInterval(() => {
                 timeLeft--;
-                document.querySelector('.timer').textContent = `Timer: ${timeLeft}s`;
+                $('.timer').text(`Timer: ${timeLeft}s`);
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     alert('Time\'s up! You have completed the quiz.');
-                    document.getElementById('answer').disabled = true;
-                    document.querySelector('#quiz button').disabled = true;
+                    $('#answer').prop('disabled', true);
+                    $('#quiz button').prop('disabled', true);
                 }
             }, 1000);
         }
 
         function updateProgressBar() {
-            const progressBarFill = document.querySelector('.progress-bar-fill');
+            const progressBarFill = $('.progress-bar-fill');
             const progress = (currentQuestion / questions.length) * 100;
-            progressBarFill.style.width = `${progress}%`;
+            progressBarFill.css('width', `${progress}%`);
         }
 
         function getHighScores() {
             const highScores = localStorage.getItem('highScores');
             if (highScores) {
                 const scores = JSON.parse(highScores);
-                const highScoresList = document.getElementById('high-scores');
+                const highScoresList = $('#high-scores');
                 scores.forEach((score) => {
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `${score.username}: ${score.score}`;
-                    highScoresList.appendChild(listItem);
+                    const listItem = $('<li>');
+                    listItem.text(`${score.username}: ${score.score}`);
+                    highScoresList.append(listItem);
                 });
             }
         }
@@ -285,7 +283,7 @@
             localStorage.setItem('highScores', JSON.stringify(scores));
         }
 
-        window.addEventListener('unload', saveHighScore);
+        $(window).on('unload', saveHighScore);
     </script>
 </body>
 </html>
